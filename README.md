@@ -153,56 +153,56 @@ Saves a new user to the database. Note, that it will not save the user if the us
 exists in the database. In that case, a status code of 409 will be returned, and it is recommended
 to put this user by the **PUT /users/user-id** request.
 
-#####DELETE /users
+**DELETE /users** \
 Deletes all the users and all the snapshots from the database.
 
 
-#####GET /users/user-id 
+**GET /users/user-id** \ 
 Returns the specified user's details: ID, name, birthday and gender.
 
-#####PUT /users/user-id
+**PUT /users/user-id** \
 Saves a the user to the database. Will create a new user if the user-id id not
 already exists does not already exists.
 
-#####DELETE /users/user-id
+**DELETE /users/user-id** \
 Deletes the user and all of its snapshots from the database.
 
 
-#####GET /users/user-id/snapshots
+**GET /users/user-id/snapshots** \
 Returns the list of the specified user's snapshot IDs and datetimes only.
 
-#####POST /users/user-id/snapshots
+**POST /users/user-id/snapshots** \
 Saves a new snapshot of the given user to the database. Note, that it will not save
 the snapshot if the snapshot's datetime already exists in the database. 
 In that case, a status code of 409 will be returned, and it is recommended
 to put this user by the **PUT /users/user_id** request.
 
-#####DELETE /users/user-id/snapshots
+**DELETE /users/user-id/snapshots** \
 Deletes all the snapshots of the given user from the database.
 
 
-#####GET /users/user-id/snapshots/snapshot-id
+**GET /users/user-id/snapshots/snapshot-id** \
 Returns the specified snapshot's details: ID, datetime, and the available results' names only (e.g. pose).
 
-#####PUT /users/user-id/snapshots/snapshot-id
+**PUT /users/user-id/snapshots/snapshot-id** \
 Saves a the snapshot to the database. Will create a new snapshot if the user-id id not
 already exists does not already exists.
 
-#####DELETE /users/user-id/snapshots/snapshot-id
+**DELETE /users/user-id/snapshots/snapshot-id** \
 Deletes the snapshot from the database.
 
 
-#####GET /users/user-id/snapshots/snapshot-id/result-name
+**GET /users/user-id/snapshots/snapshot-id/result-name** \
 Returns the specified snapshot's result in a reasonable format.  
 Supported results are: pose, color-image, depth-image and feelings.  
 color-image and depth-image have large binary data, so the return data contains metadata only, with their data
 being available via: **GET /users/user-id/snapshots/snapshot-id/result-name/data**
 
-#####DELETE /users/user-id/snapshots/snapshot-id/result-name
+**DELETE /users/user-id/snapshots/snapshot-id/result-name** \
 Deletes the result from the snapshot, in the database.
 
 
-#####GET /users/user-id/snapshots/snapshot-id/result-name/data
+**GET /users/user-id/snapshots/snapshot-id/result-name/data** \
 Returns the large binary data.
 
 
