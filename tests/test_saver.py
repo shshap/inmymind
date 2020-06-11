@@ -1,3 +1,5 @@
+import json
+import threading
 import time
 
 import pytest
@@ -6,35 +8,35 @@ from flask import Flask, request
 from inmymind.saver import Saver
 
 app = Flask(__name__)
-user = None
-snapshot = None
+app.user = None
+app.snapshot = None
 host = '127.0.0.1'
-port = 8000
+port = 5001
 
 
-@app.route('/users')
+@app.route('/users/', methods=['POST'])
 def users():
-    global user
-    user = request.data
+    app.user = request.data
     return '', 200
 
 
-@app.route('/users/42/snapshots')
+@app.route('/users/21/snapshots/', methods=['POST'])
 def snapshots():
-    global snapshot
-    snapshot = request.data
+    app.snapshot = request.data
     return '', 200
 
 
 @pytest.fixture
-def mock_api():
-    app.run(host, port)
+def api():
+    t = threading.Thread(target=app.run, args=(host, port))
+    t.daemon = True
+    t.start()
 
 
-def test_saver(mock_api):
-    saver = Saver()
-    saver.save_all_types('user', {'user_id': 21, 'username': 'Amit'})
-    saver.save({'feelings': {}})
-    time.sleep(3)
-    assert user
-    assert snapshot
+def test_saver(api):
+    saver = Saver(f'http://{host}:{port}')
+    saver.save_all_types('user', json.dumps({'user_id': 21, 'username': 'Amit'}))
+    saver.save('feelings', json.dumps({'user_id': 21, 'datetime': 120520, 'feelings': {}}))
+    time.sleep(1)
+    assert app.user
+    assert app.snapshot
