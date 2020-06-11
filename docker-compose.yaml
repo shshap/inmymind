@@ -1,0 +1,155 @@
+version: '3'
+
+services:
+  mongodb:
+    hostname: "mongodb"
+    image: mongo
+    restart: on-failure
+    networks:
+      - localnet
+
+  api:
+    hostname: "api"
+    build: inmymind/api
+    command: python -m inmymind.api run_api_server 'http://localhost:5000' 'mongo://mongodb:27017'
+    expose:
+      - "5000"
+    ports:
+      - "5000:5000"
+    volumes:
+      - .:/usr/src/app
+    restart: on-failure
+    depends_on:
+      - "mongodb"
+    networks:
+      - localnet
+
+  rabbitmq:
+    hostname: "rabbitmq"
+    image: rabbitmq:3.8-management
+    expose:
+      - "5672"
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    restart: on-failure
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "5672"]
+      interval: 5s
+      timeout: 15s
+      retries: 1
+    networks:
+      - localnet
+
+  server:
+    hostname: "server"
+    build: inmymind/server
+    command: python -m inmymind.server run-server -h '0.0.0.0' -p 8000 'rabbitmq://rabbitmq:5672'
+    volumes:
+      - .:/usr/src/app
+    depends_on:
+      - "rabbitmq"
+    restart: on-failure
+    networks:
+      - localnet
+
+  pose:
+    hostname: "pose"
+    build: parser
+    command: python -m inmymind.parsers run-parser 'pose' 'rabbitmq://rabbitmq:5672'
+    volumes:
+      - .:/usr/src/app
+    depends_on:
+      - "rabbitmq"
+    restart: on-failure
+    networks:
+      - localnet
+
+  feelings:
+    hostname: "feelings"
+    build: parser
+    command: python -m inmymind.parsers run-parser 'feelings' 'rabbitmq://rabbitmq:5672'
+    volumes:
+      - .:/usr/src/app
+    depends_on:
+      - "rabbitmq"
+      - "server"
+    restart: on-failure
+    networks:
+      - localnet
+
+  color_image:
+    hostname: "color_image"
+    build: parser
+    command: python -m inmymind.parsers run-parser 'color_image' 'rabbitmq://rabbitmq:5672'
+    volumes:
+      - .:/usr/src/app
+    depends_on:
+      - "rabbitmq"
+    restart: on-failure
+    networks:
+      - localnet
+
+  depth_image:
+    hostname: "depth_image"
+    build: parser
+    command: python -m inmymind.parsers run-parser 'depth_image' 'rabbitmq://rabbitmq:5672'
+    volumes:
+      - .:/usr/src/app
+    depends_on:
+      - "rabbitmq"
+    restart: on-failure
+    networks:
+      - localnet
+
+  saver:
+    hostname: "saver"
+    build: inmymind/saver
+    command: python -m inmymind.saver run-saver 'http://api:80' 'rabbitmq://rabbitmq:5672'
+    volumes:
+      - .:/usr/src/app
+    depends_on:
+      - "rabbitmq"
+    restart: on-failure
+    networks:
+      - localnet
+
+  client:
+    hostname: "client"
+      build: client
+      command: python -m inmymind.client upload-sample -h 'server' -p 8000 'http://api:80' 'sample.mind.gz'
+      volumes:
+        - .:/usr/src/app
+      depends_on:
+        - "rabbitmq"
+      restart: on-failure
+      networks:
+        - localnet
+
+  cli:
+    hostname: "cli"
+    image: python:3.8
+    volumes:
+      - .:/usr/src/app
+    depends_on:
+      - "api"
+    restart: on-failure
+    networks:
+      - localnet
+
+  gui:
+    hostname: "gui"
+    image: python:3.8
+    command: python -m inmymind.gui run-server -h '0.0.0.0' -p 8080 -H 'api' -P 5000
+    volumes:
+      - .:/usr/src/app
+    depends_on:
+      - "api"
+    restart: on-failure
+    networks:
+      - localnet
+
+
+networks:
+  localnet:
+    driver: bridge
