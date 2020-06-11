@@ -4,6 +4,6 @@ python:
 install:
     - pip install -r requirements.txt
 script:
-    - pytest --cov-report term --cov=inmymind
+    - pytest --cov-report term --cov=inmymind tests/
 after_success:
     - codecov
