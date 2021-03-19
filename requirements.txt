@@ -38,7 +38,7 @@ optional-django==0.1.0
 packaging==20.4
 paramiko==2.7.1
 pika==1.1.0
-Pillow==7.1.2
+Pillow==8.1.1
 pluggy==0.13.1
 protobuf==3.12.2
 py==1.8.1
