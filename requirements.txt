@@ -36,7 +36,7 @@ npm==0.1.1
 numpy==1.18.5
 optional-django==0.1.0
 packaging==20.4
-paramiko==2.7.1
+paramiko==2.10.1
 pika==1.1.0
 Pillow==7.1.2
 pluggy==0.13.1
